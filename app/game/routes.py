@@ -19,7 +19,7 @@ def categories():
 def about():
     return render_template('about.html')
 
-@game.route('/dashboard/<int:child_id>, <int:category_id>'')
+@game.route('/dashboard/<int:child_id>/<int:category_id>')
 @login_required
 def game_dashboard(child_id):
     child = ChildProfile.query.get_or_404(child_id)
@@ -41,6 +41,38 @@ def game_dashboard(child_id):
     @game.route('/submit_answer/<int:child_id>/<int:category_id>', methods=['POST'])
     
 @login_required
+def result():
+    # Final result page for the game
+    # This could show the score, time taken, etc.
+    return render_template('result.html')
+
+def get_next_round(child_id, category_id):
+    # Logic to decide whether to continue to the next round or end the game
+    current_round = session.get('current_round', 1)
+    total_rounds = 10  # Example: 5 rounds per game
+    if current_round < total_rounds:
+        session['current_round'] = current_round + 1
+        return True
+def submit_answer(child_id, category_id):
+    selected_image_id = request.form.get('selected_image_id')  # Get the image ID the child selected
+    correct_image_id = request.form.get('correct_image_id')  # Get the correct image ID
+
+    child = ChildProfile.query.get_or_404(child_id)
+    
+    if selected_image_id == correct_image_id:
+        # Increase the score and play congratulations sound
+        session['score'] = session.get('score', 0) + 1
+        flash('Correct! Good job!', 'success')
+        # Optionally, play congratulations sound
+    else:
+        flash('Oops! The correct answer was the other one.', 'error')
+
+    # Move to the next round or show the final result if this is the last round
+    next_round = get_next_round(child_id, category_id)  # Function to get next round logic
+    if next_round:
+        return redirect(url_for('game.game_dashboard', child_id=child_id, category_id=category_id))
+    else:
+        return redirect(url_for('game.result', child_id=child_id))
 def submit_answer(child_id, category_id):
     selected_image_id = request.form.get('selected_image_id')  # Get the image ID the child selected
     correct_image_id = request.form.get('correct_image_id')  # Get the correct image ID
@@ -93,4 +125,3 @@ def result(child_id):
     session.pop('score', None)
 
     return render_template('result.html', child_id=child_id, score=score)
-        
