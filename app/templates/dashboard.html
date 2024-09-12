@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Dashboard</title>
+    <style>
+        /* Basic styling for images */
+        .images {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+
+        .image-option img {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .image-option {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>{{ category.name }}</h1>
+    <p>Listen carefully to the audio and select the correct image.</p>
+
+    <!-- Audio element without autoplay -->
+    <audio id="gameAudio">
+        <source src="{{ url_for('static', filename='audio/' + audio_file) }}" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <div class="images">
+        <!-- Display images as clickable options -->
+        {% for image in images %}
+        <div class="image-option">
+            <img src="{{ url_for('static', filename='images/' + image.image_file) }}" alt="Image option">
+            <form action="{{ url_for('game.submit_answer', child_id=child.id, category_id=category.id) }}" method="POST">
+                <input type="hidden" name="selected_image_id" value="{{ image.id }}">
+                <input type="hidden" name="correct_image_id" value="{{ correct_image.id }}">
+                <button type="submit">Select</button>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+
+    <script>
+        // JavaScript to handle playing the audio three times
+        window.onload = function() {
+            var audioElement = document.getElementById('gameAudio');
+            var playCount = 0;
+
+            // Function to play the audio and track how many times it has played
+            function playAudio() {
+                if (playCount < 3) {
+                    audioElement.play();
+                    playCount++;
+                }
+            }
+
+            // Event listener to play the audio 3 times
+            audioElement.onended = function() {
+                setTimeout(playAudio, 1000); // Set a 1-second delay between plays
+            };
+
+            // Start playing audio when the page loads
+            playAudio();
+        };
+    </script>
+</body>
+</html>

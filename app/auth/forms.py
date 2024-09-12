@@ -1,6 +1,8 @@
+# pylint: disable=C0103
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField
+from wtforms import StringField, PasswordField, SubmitField, SelectField, IntegerField
 from wtforms.validators import DataRequired, Email, EqualTo, Length
+from wtforms.validators import NumberRange
 
 class LoginForm(FlaskForm):
     """Form for users to log in."""
@@ -19,7 +21,7 @@ class RegisterForm(FlaskForm):
     confirm_password = PasswordField('Confirm Password', validators=[DataRequired()])
     submit = SubmitField('Register')
 
-class BabyProfileForm(FlaskForm):
+class ChildProfileForm(FlaskForm):
     username = StringField('Child Username', validators=[DataRequired()])
     gender = SelectField('Gender', choices=[('male', 'Male'), ('female', 'Female')], validators=[DataRequired()])
     age = IntegerField('Age', validators=[DataRequired(), NumberRange(min=1, max=100)])

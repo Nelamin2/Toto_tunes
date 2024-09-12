@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, login_required
+from flask_login import current_user
 from .forms import LoginForm, RegisterForm  # Forms for login and registration
 from ..models import User  # Importing User model from the main application
 from .. import db, bcrypt  # Importing bcrypt and database instances from the main app
