@@ -1,4 +1,4 @@
-#!/Users/nidalelamin/toto_tunes/venv/bin/python3.12
+#!/Users/nidalelamin/toto_tunes/venv/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys
