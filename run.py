@@ -1,4 +1,4 @@
-# pylint: disable=C0103
+
 from app import create_app
 
 app = create_app()

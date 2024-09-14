@@ -1,42 +1,46 @@
-import os
+""" main application package """
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-from flask_redis import FlaskRedis
+#from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
+from flask_migrate import Migrate
+from config import Config
+from .models import  db, User
 
-db = SQLAlchemy()
-migrate = Migrate()
-redis_store = FlaskRedis()
+# db = SQLAlchemy()
 bcrypt = Bcrypt()
 login_manager = LoginManager()
+login_manager.login_view = 'auth.login'  # Specify the route for login page
+login_manager.login_message_category = 'info'  # Flash message category
 
-def create_app():
+def create_app(config_class=Config):
+    """ Create and configure the app """
     app = Flask(__name__)
+    app.config.from_object(config_class)
 
-    # Load configurations
-    app.config['SECRET_KEY'] = 'thisisasecretkey'
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['REDIS_URL'] = 'redis://localhost:6379/0'
-    app.config['BCRYPT_LOG_ROUNDS'] = 12
-    app.config['SESSION_TYPE'] = 'filesystem'
-
-    # Initialize extensions with the app
     db.init_app(app)
-    migrate.init_app(app, db)
-    redis_store.init_app(app)
+    migrate = Migrate(app, db)
     bcrypt.init_app(app)
     login_manager.init_app(app)
-    login_manager.login_view = 'auth.login'  # Adjust this to match your actual login view
-    login_manager.login_message_category = 'info'
+    # Test hashing
+    test_password = "testpassword"
+    hashed = bcrypt.generate_password_hash(test_password).decode('utf-8')
+    print("Hashed Password:", hashed)
 
-    # Register blueprints with the app
-    with app.app_context():
-        from .auth.routes import auth as auth_blueprint
-        from .game.routes import game as game_blueprint
-        app.register_blueprint(auth_blueprint, url_prefix='/auth')
-        app.register_blueprint(game_blueprint, url_prefix='/game')
+    # Test checking
+    is_correct = bcrypt.check_password_hash(hashed, test_password)
+    print("Password Match:", is_correct)  # Should return True
+
+
+    from .auth.routes import auth  # Blueprint imports
+    from .game.routes import game
+    app.register_blueprint(auth)
+    app.register_blueprint(game)
 
     return app
+
+# User loader callback for Flask-Login
+@login_manager.user_loader
+def load_user(user_id):
+    """ Load user by ID """
+    return User.query.get(int(user_id))
