@@ -1,74 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Dashboard</title>
-    <style>
-        /* Basic styling for images */
-        .images {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 20px;
-        }
+@game.route('/dashboard/<int:child_id>/<int:category_id>')
+@login_required
+def game_dashboard(child_id, category_id):
+    child = ChildProfile.query.get_or_404(child_id)
+    category = Category.query.get_or_404(category_id)
 
-        .image-option img {
-            width: 150px;
-            height: 150px;
-            object-fit: cover;
-        }
+    # Get the correct element (image, word) for the category
+    correct_element = Element.query.filter_by(category_id=category.id).order_by(db.func.random()).first()
 
-        .image-option {
-            text-align: center;
-        }
-    </style>
-</head>
-<body>
-    <h1>{{ category.name }}</h1>
-    <p>Listen carefully to the audio and select the correct image.</p>
+    # Select two random incorrect elements (not the correct one)
+    incorrect_elements = Element.query.filter(Element.category_id == category.id, Element.id != correct_element.id).order_by(db.func.random()).limit(2).all()
 
-    <!-- Audio element without autoplay -->
-    <audio id="gameAudio">
-        <source src="{{ url_for('static', filename='audio/' + audio_file) }}" type="audio/mpeg">
-        Your browser does not support the audio element.
-    </audio>
+    # Combine correct and incorrect elements
+    elements = incorrect_elements + [correct_element]
 
-    <div class="images">
-        <!-- Display images as clickable options -->
-        {% for image in images %}
-        <div class="image-option">
-            <img src="{{ url_for('static', filename='images/' + image.image_file) }}" alt="Image option">
-            <form action="{{ url_for('game.submit_answer', child_id=child.id, category_id=category.id) }}" method="POST">
-                <input type="hidden" name="selected_image_id" value="{{ image.id }}">
-                <input type="hidden" name="correct_image_id" value="{{ correct_image.id }}">
-                <button type="submit">Select</button>
-            </form>
-        </div>
-        {% endfor %}
-    </div>
+    # Shuffle elements so the correct one isn't always last
+    random.shuffle(elements)
 
-    <script>
-        // JavaScript to handle playing the audio three times
-        window.onload = function() {
-            var audioElement = document.getElementById('gameAudio');
-            var playCount = 0;
+    # Pass the data to the template
+    return render_template('dashboard.html', child=child, elements=elements, category=category, correct_element=correct_element)
 
-            // Function to play the audio and track how many times it has played
-            function playAudio() {
-                if (playCount < 3) {
-                    audioElement.play();
-                    playCount++;
-                }
-            }
-
-            // Event listener to play the audio 3 times
-            audioElement.onended = function() {
-                setTimeout(playAudio, 1000); // Set a 1-second delay between plays
-            };
-
-            // Start playing audio when the page loads
-            playAudio();
-        };
-    </script>
-</body>
-</html>

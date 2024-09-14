@@ -38,22 +38,20 @@ def game_dashboard(child_id, category_id):
     child = ChildProfile.query.get_or_404(child_id)
     category = Category.query.get_or_404(category_id)
 
-    # Fetch the correct image (use Element instead of Image)
-    correct_image = Element.query.filter_by(category_id=category.id).order_by(db.func.random()).first()
+    # Get the correct element (image, word) for the category
+    correct_element = Element.query.filter_by(category_id=category.id).order_by(db.func.random()).first()
 
-    # Select two random incorrect images (not the correct one)
-    incorrect_images = Element.query.filter(Element.category_id == category.id, Element.id != correct_image.id).order_by(db.func.random()).limit(2).all()
+    # Select two random incorrect elements (not the correct one)
+    incorrect_elements = Element.query.filter(Element.category_id == category.id, Element.id != correct_element.id).order_by(db.func.random()).limit(2).all()
 
-    # Combine correct and incorrect images
-    images = incorrect_images + [correct_image]
+    # Combine correct and incorrect elements
+    elements = incorrect_elements + [correct_element]
 
-    # Shuffle images so the correct one isn't always last
-    random.shuffle(images)
+    # Shuffle elements so the correct one isn't always last
+    random.shuffle(elements)
 
-    # Pass the audio file of the correct image
-    correct_audio = correct_image.audio_file
-
-    return render_template('dashboard.html', child=child, images=images, category=category, correct_image=correct_image, correct_audio=correct_audio)
+    # Pass the data to the template
+    return render_template('dashboard.html', child=child, elements=elements, category=category, correct_element=correct_element)
 
 @game.route('/submit_answer/<int:child_id>/<int:category_id>', methods=['POST'])
 @login_required
