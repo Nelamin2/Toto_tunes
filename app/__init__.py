@@ -1,37 +1,34 @@
-""" main application package """
+""" Main application package """
 from flask import Flask
-#from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
-from flask_migrate import Migrate
 from config import Config
-from .models import  db, User
+from .models import db, User
+from flask_argon2 import Argon2
+from flask_sqlalchemy import SQLAlchemy
 
-# db = SQLAlchemy()
-bcrypt = Bcrypt()
 login_manager = LoginManager()
-login_manager.login_view = 'auth.login'  # Specify the route for login page
-login_manager.login_message_category = 'info'  # Flash message category
 
-def create_app(config_class=Config):
+def create_app():
     """ Create and configure the app """
+
+
     app = Flask(__name__)
-    app.config.from_object(config_class)
+    #app configuration
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
+    app.config['SECRET_KEY'] = '13bb2a29bc310ad29aee814ab700698936c459511f664d96f077bc9421e47a0c'
 
+
+    # Initialize extensions
     db.init_app(app)
-    migrate = Migrate(app, db)
-    bcrypt.init_app(app)
+    #bcrypt.init_app(app)
     login_manager.init_app(app)
-    # Test hashing
-    test_password = "testpassword"
-    hashed = bcrypt.generate_password_hash(test_password).decode('utf-8')
-    print("Hashed Password:", hashed)
 
-    # Test checking
-    is_correct = bcrypt.check_password_hash(hashed, test_password)
-    print("Password Match:", is_correct)  # Should return True
+    # Create database tables
+    with app.app_context():
+        db.create_all()
 
-
+    # Import and register blueprints
     from .auth.routes import auth  # Blueprint imports
     from .game.routes import game
     app.register_blueprint(auth)

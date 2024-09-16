@@ -1,11 +1,16 @@
 """ Models for the application"""
 from datetime import datetime
 from flask_login import UserMixin
-from werkzeug.security import generate_password_hash, check_password_hash
+#from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
-from flask_bcrypt import Bcrypt
+#from flask_bcrypt import Bcrypt
+#initilize db object
+from flask_argon2 import Argon2
 
+#create an instance of the PasswordHasher
+#ph = PasswordHasher()
 db = SQLAlchemy()
+argon2= Argon2()
 
 class User(db.Model, UserMixin):
     """User model for authentication.
@@ -19,22 +24,20 @@ class User(db.Model, UserMixin):
     """
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
-    password_hash = db.Column(db.String(128), nullable=False)
+    password_hash = db.Column(db.String(128), nullable=False)  # Keep password_hash to match the database column
     children = db.relationship('ChildProfile', backref='parent', lazy=True)
-
-    def __init__(self, email, password):
-        """Initialize User object and hash password."""
-        self.email = email
-        self.password_hash = bcrypt.generate_password_hash(password).decode('utf-8')  # Ensure password is hashed using bcrypt
-
     def __repr__(self):
-        """Return User object as string (email only)."""
         return f"User('{self.email}')"
 
-    def check_password(self, password):
-        """Check if password is correct using bcrypt."""
-        return bcrypt.check_password_hash(self.password_hash, password)
+    def set_password(self, password):
+        """Hashes the password and stores it using Argon2."""  
+        self.password_hash = argon2.generate_password_hash(password)
 
+    def check_password(self, password):
+        """Checks if the provided password matches the stored hash using Argon2."""
+        return argon2.check_password_hash(self.password_hash, password)
+
+# Child profile model
 class ChildProfile(db.Model):
     """ Child profile model
     args:

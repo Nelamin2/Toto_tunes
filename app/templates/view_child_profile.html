@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ child.username }}'s Profile</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>{{ child.username }}'s Profile</h1>
+        
+        <div class="profile-details">
+            <p><strong>Name:</strong> {{ child.username }}</p>
+            <p><strong>Gender:</strong> {{ child.gender }}</p>
+            <p><strong>Age:</strong> {{ child.age }}</p>
+        </div>
+
+        <div class="profile-actions">
+            <a href="{{ url_for('auth.update_child_profile', child_id=child.id) }}" class="btn btn-primary">Edit Profile</a>
+            <a href="{{ url_for('auth.view_children') }}" class="btn btn-secondary">Back to profiles</a>
+        </div>
+    </div>
+</body>
+</html>

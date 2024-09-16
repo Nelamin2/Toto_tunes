@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Categories</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .bottom-right {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5 position-relative">
+        <div class="d-flex justify-content-between">
+            <h1>Categories</h1>
+            <!-- Display the child's name in the upper right corner with a smaller heading -->
+            <h4 class="align-self-center">
+                <a href="{{ url_for('auth.view_child', child_id=child_id) }}">{{ child_name }}</a>
+            </h4> 
+        </div>
+
+        <div class="row mt-3">
+            <!-- Categories list -->
+            <div class="col-md-3">
+                <a href="{{ url_for('game_dashboard', child_id=child_id, category_id=1) }}" class="btn btn-lg btn-block btn-primary">Alphabet</a>
+            </div>
+            <div class="col-md-3">
+                <a href="{{ url_for('game_dashboard', child_id=child_id, category_id=2) }}" class="btn btn-lg btn-block btn-success">Colors</a>
+            </div>
+            <div class="col-md-3">
+                <a href="{{ url_for('game_dashboard', child_id=child_id, category_id=3) }}" class="btn btn-lg btn-block btn-info">Numbers</a>
+            </div>
+            <div class="col-md-3">
+                <a href="{{ url_for('game_dashboard', child_id=child_id, category_id=4) }}" class="btn btn-lg btn-block btn-warning">Shapes</a>
+            </div>
+            <div class="col-md-3 mt-3">
+                <a href="{{ url_for('game_dashboard', child_id=child_id, category_id=5) }}" class="btn btn-lg btn-block btn-danger">Animals</a>
+            </div>
+            <div class="col-md-3 mt-3">
+                <a href="{{ url_for('game_dashboard', child_id=child_id, category_id=6) }}" class="btn btn-lg btn-block btn-dark">Vehicles</a>
+            </div>
+            <div class="col-md-3 mt-3">
+                <a href="{{ url_for('game_dashboard', child_id=child_id, category_id=7) }}" class="btn btn-lg btn-block btn-secondary">Fruits</a>
+            </div>
+            <div class="col-md-3 mt-3">
+                <a href="{{ url_for('game_dashboard', child_id=child_id, category_id=8) }}" class="btn btn-lg btn-block btn-primary">Vegetables</a>
+            </div>
+            <div class="col-md-3 mt-3">
+                <a href="{{ url_for('game_dashboard', child_id=child_id, category_id=9) }}" class="btn btn-lg btn-block btn-info">Human Body</a>
+            </div>
+        </div>
+
+        <!-- Back to profiles button in the bottom right corner -->
+        <a href="{{ url_for('view_children') }}" class="btn btn-warning bottom-right">Back to Profiles</a>
+    </div>
+</body>
+</html>
+
+

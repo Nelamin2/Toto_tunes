@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Dashboard</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>{{ child_name }}'s Game - {{ category_name }}</h1>
+        
+        <!-- This is where your game logic and interface would go -->
+        <p>Welcome to the {{ category_name }} game!</p>
+        
+        <!-- Add game content here -->
+        <div class="game-content">
+            <!-- Example: Use category_id to determine what game to display -->
+            {% if category_name == 'Alphabet' %}
+                <p>This is the Alphabet game.</p>
+            {% elif category_name == 'Colors' %}
+                <p>This is the Colors game.</p>
+            {% elif category_name == 'Numbers' %}
+                <p>This is the Numbers game.</p>
+            {% else %}
+                <p>This game is under construction!</p>
+            {% endif %}
+        </div>
+
+        <!-- Back to categories button -->
+        <a href="{{ url_for('categories', child_id=child_id) }}" class="btn btn-secondary mt-3">Back to Categories</a>
+    </div>
+</body>
+</html>
+
+</html>

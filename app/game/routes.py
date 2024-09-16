@@ -1,20 +1,30 @@
+""" This module contains the routes for the game section of the app """
 import random  # Import the 'random' module
 from flask import Blueprint, render_template, session, redirect, url_for, flash, request
 from flask_login import login_required
 from ..models import db, ChildProfile, Category, Element
 
+
 game = Blueprint('game', __name__)
 
 @game.route('/')
 def home():
+    """ Show the home page """
     return render_template('home.html')
 
-@game.route('/categories')
+@game.route('/categories/<int:profile_id>')
 @login_required
-def categories():
+def categories(profile_id):
     """ Show the list of game categories """
     game_categories = Category.query.all()
-    return render_template('categories.html', categories=game_categories)
+    child = ChildProfile.query.get_or_404(profile_id)
+    return render_template('categories.html', categories=game_categories, child_name = child.username, child_id = child.id)
+
+
+def profile(profile_id):
+    """ Show the list of child profiles """
+    child_name = ChildProfile.query.get_or_404(profile_id)
+    return render_template('profile.html', child_name=child_name)
 
 @game.route('/select_category/<int:category_id>')
 @login_required
@@ -26,15 +36,18 @@ def select_category(category_id):
         flash("Please select a profile before playing.", "warning")
         return redirect(url_for('game.categories'))
 
-    return redirect(url_for('game.game_dashboard', child_id=child_id, category_id=category_id))
+    return redirect(url_for('game.dashboard', child_id=child_id, category_id=category_id))
+
 
 @game.route('/about')
 def about():
+    """ Show the about page """
     return render_template('about.html')
 
-@game.route('/dashboard/<int:child_id>/<int:category_id>')
+@game.route('/game_dashboard/<int:child_id>/<int:category_id>')
 @login_required
 def game_dashboard(child_id, category_id):
+    """ Show the game dashboard with the images and words """
     child = ChildProfile.query.get_or_404(child_id)
     category = Category.query.get_or_404(category_id)
 
