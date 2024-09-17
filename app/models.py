@@ -78,16 +78,17 @@ class Element(db.Model):
     
     Args:
         db (object): db object from app/__init__.py
-        Returns:  element object with image_file, audio_file, category_id, and date_added"""
+        Returns:  element object with image_file, text_description, category_id, and date_added"""
     id = db.Column(db.Integer, primary_key=True)
     image_file = db.Column(db.String(100), nullable=False)
-    audio_file = db.Column(db.String(100), nullable=False)
+    text_description = db.Column(db.String(200), nullable=False)  # New field for description or text
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=False)
     date_added = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     def __repr__(self):
         """ Return element object as string"""
-        return f"Element('{self.image_file}', '{self.audio_file}', '{self.category.name}')"
+        return f"Element('{self.image_file}', '{self.text_description}', '{self.category.name}')"
+
 
 # Score model
 class Score(db.Model):

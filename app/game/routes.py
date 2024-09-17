@@ -1,9 +1,7 @@
-""" This module contains the routes for the game section of the app """
 import random  # Import the 'random' module
-from flask import Blueprint, render_template, session, redirect, url_for, flash, request
+from flask import jsonify, Blueprint, render_template, session, redirect, url_for, flash, request
 from flask_login import login_required
 from ..models import db, ChildProfile, Category, Element
-
 
 game = Blueprint('game', __name__)
 
@@ -18,26 +16,25 @@ def categories(profile_id):
     """ Show the list of game categories """
     game_categories = Category.query.all()
     child = ChildProfile.query.get_or_404(profile_id)
-    return render_template('categories.html', categories=game_categories, child_name = child.username, child_id = child.id)
+    return render_template('categories.html', categories=game_categories, child_name=child.username, child_id=child.id)
 
-
-def profile(profile_id):
-    """ Show the list of child profiles """
-    child_name = ChildProfile.query.get_or_404(profile_id)
-    return render_template('profile.html', child_name=child_name)
-
-@game.route('/select_category/<int:category_id>')
+@game.route('/select_category/<int:child_id>/<int:category_id>')
 @login_required
-def select_category(category_id):
+def select_category(child_id, category_id):
     """ Select a specific category and redirect to the game dashboard """
-    #category = Category.query.get_or_404(category_id)
-    child_id = session.get('child_id')  # Assuming child ID is stored in session after login
-    if not child_id:
-        flash("Please select a profile before playing.", "warning")
-        return redirect(url_for('game.categories'))
+    # Ensure the child_id is in the session
+    if not session.get('child_id'):
+        session['child_id'] = child_id
 
-    return redirect(url_for('game.dashboard', child_id=child_id, category_id=category_id))
+    return redirect(url_for('game.game_dashboard', child_id=child_id, category_id=category_id))
 
+@game.route('/generate_audio/<text>', methods=['GET'])
+@login_required
+def generate_audio(text):
+    """ Generate an audio file for the given text """
+    # Construct the URL for the Responsive API
+    audio_url = f"https://code.responsivevoice.org/getvoice.php?t={text}&tl=en&sv=male&key=SzVfLas9"
+    return jsonify({'audio_url': audio_url})
 
 @game.route('/about')
 def about():
@@ -51,8 +48,11 @@ def game_dashboard(child_id, category_id):
     child = ChildProfile.query.get_or_404(child_id)
     category = Category.query.get_or_404(category_id)
 
-    # Get the correct element (image, word) for the category
+    # Get a random element for the category
     correct_element = Element.query.filter_by(category_id=category.id).order_by(db.func.random()).first()
+
+    # Generate audio URL for the correct element
+    audio_url = url_for('generate_audio', text=correct_element.text_description)
 
     # Select two random incorrect elements (not the correct one)
     incorrect_elements = Element.query.filter(Element.category_id == category.id, Element.id != correct_element.id).order_by(db.func.random()).limit(2).all()
@@ -64,7 +64,7 @@ def game_dashboard(child_id, category_id):
     random.shuffle(elements)
 
     # Pass the data to the template
-    return render_template('dashboard.html', child=child, elements=elements, category=category, correct_element=correct_element)
+    return render_template('dashboard.html', child=child, elements=elements, category=category, correct_element=correct_element, audio_url=audio_url)
 
 @game.route('/submit_answer/<int:child_id>/<int:category_id>', methods=['POST'])
 @login_required

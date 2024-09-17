@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Result</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.responsivevoice.org/responsivevoice.js?key=YOUR_API_KEY"></script> <!-- Include ResponsiveVoice -->
+    <script>
+        function speakResult(score) {
+            responsiveVoice.speak("Game over! Your score is " + score, "UK English Male");
+        }
+    </script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Game Over!</h1>
+        <p>Your score: {{ score }}</p>
+        
+        <!-- Start over -->
+        <a href="{{ url_for('game_dashboard', child_id=session.get('child_id'), category_id=session.get('category_id')) }}" class="btn btn-success">Start Over</a>
+        
+        <!-- Back to dashboard -->
+        <a href="{{ url_for('dashboard') }}" class="btn btn-warning">Back to Dashboard</a>
+        
+        <script>
+            // Speak the result when the page loads
+            window.onload = function() {
+                speakResult("{{ score }}");
+            };
+        </script>
+    </div>
+</body>
+</html>

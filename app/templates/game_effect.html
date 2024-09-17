@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Play Game</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.responsivevoice.org/responsivevoice.js?key=YOUR_API_KEY"></script> <!-- Replace YOUR_API_KEY with your actual key -->
+    <script>
+        var timeLeft = 10;  // 10 seconds for the timer
+        var timerId;
+        var currentQuestion = 0;
+        var totalQuestions = 10;
+        var score = 0;
+        var correctAnswer = "";  // Correct answer for the current question
+        var images = [];  // Placeholder for images and answers
+        var answerSubmitted = false;
+
+        // Start the countdown timer
+        function startTimer() {
+            timeLeft = 10;
+            timerId = setInterval(countdown, 1000);
+        }
+
+        function countdown() {
+            if (timeLeft == 0) {
+                highlightCorrectAnswer();
+                moveToNextQuestion();
+            } else {
+                document.getElementById('timer').innerHTML = timeLeft + ' seconds remaining';
+                timeLeft--;
+            }
+        }
+
+        // Play the sound corresponding to the correct answer
+        function playSound(sound) {
+            responsiveVoice.speak(sound, "UK English Male");
+        }
+
+        // Highlight the correct answer if time runs out or wrong answer is selected
+        function highlightCorrectAnswer() {
+            document.getElementById(correctAnswer).classList.add('btn-success'); // Highlight correct answer in green
+        }
+
+        // Handle user's answer
+        function submitAnswer(answer) {
+            if (answerSubmitted) return;  // Avoid multiple submissions
+            answerSubmitted = true;
+            clearTimeout(timerId);  // Stop the timer
+
+            if (answer === correctAnswer) {
+                score++;
+                document.getElementById('result').innerHTML = "<h3 class='text-success'>Bravo!</h3>";
+                responsiveVoice.speak("Bravo!", "UK English Male");
+            } else {
+                highlightCorrectAnswer();
+                document.getElementById('result').innerHTML = "<h3 class='text-danger'>Wrong! Correct answer was " + correctAnswer + ".</h3>";
+                responsiveVoice.speak("Wrong answer! Correct answer was " + correctAnswer, "UK English Male");
+            }
+            
+            // Move to the next question after a delay
+            setTimeout(moveToNextQuestion, 2000);
+        }
+
+        // Move to the next question or finish the game
+        function moveToNextQuestion() {
+            answerSubmitted = false;  // Reset for next question
+            currentQuestion++;
+            if (currentQuestion < totalQuestions) {
+                loadNextQuestion();
+            } else {
+                finishGame();
+            }
+        }
+
+        // Load the next question (you'll need to update this with actual logic)
+        function loadNextQuestion() {
+            // Example for new data:
+            correctAnswer = images[currentQuestion].correct;
+            playSound(correctAnswer);
+
+            // Reset the timer
+            startTimer();
+
+            // Update the UI with new images
+            document.getElementById('images-container').innerHTML = ""; // Clear previous images
+            images[currentQuestion].options.forEach(function(image) {
+                document.getElementById('images-container').innerHTML += `
+                    <div class="col-md-4">
+                        <button id="${image}" class="btn btn-lg btn-primary" onclick="submitAnswer('${image}')">
+                            <img src="{{ url_for('static', filename='images/' ~ image ~ '.jpg') }}" alt="${image}" class="img-fluid">
+                        </button>
+                    </div>`;
+            });
+            document.getElementById('result').innerHTML = "";  // Clear result message
+        }
+
+        // Finish the game after all questions are answered
+        function finishGame() {
+            document.getElementById('game-container').innerHTML = "<h2>Game Over! Your score: " + score + " / " + totalQuestions + "</h2>";
+            responsiveVoice.speak("Game Over! Your score is " + score + ".", "UK English Male");
+        }
+
+        // Start the first question on page load
+        window.onload = function() {
+            // Initialize questions and answers
+            images = [
+                {correct: "orange", options: ["apple", "mango", "orange"]},
+                {correct: "dog", options: ["cat", "dog", "cow"]},
+                // Add more questions as needed...
+            ];
+            loadNextQuestion();
+        };
+    </script>
+</head>
+<body>
+    <div class="container mt-5" id="game-container">
+        <h1>Match the Sound</h1>
+        
+        <!-- Timer -->
+        <h2 id="timer">10 seconds remaining</h2>
+
+        <!-- Display images for selecting answers -->
+        <div class="row" id="images-container">
+            <!-- Images will be dynamically inserted here -->
+        </div>
+
+        <!-- Display result messages -->
+        <div id="result"></div>
+    </div>
+</body>
+</html>

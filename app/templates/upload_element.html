@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Element</title>
+</head>
+<body>
+    <h1>Upload New Element</h1>
+    <form method="POST" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <div>
+            {{ form.image_file.label }}<br>
+            {{ form.image_file() }}<br>
+            {% for error in form.image_file.errors %}
+                <span class="error">{{ error }}</span><br>
+            {% endfor %}
+        </div>
+        <div>
+            {{ form.audio_file.label }}<br>
+            {{ form.audio_file() }}<br>
+            {% for error in form.audio_file.errors %}
+                <span class="error">{{ error }}</span><br>
+            {% endfor %}
+        </div>
+        <div>
+            {{ form.category_id.label }}<br>
+            {{ form.category_id() }}<br>
+            {% for error in form.category_id.errors %}
+                <span class="error">{{ error }}</span><br>
+            {% endfor %}
+        </div>
+        <div>
+            {{ form.submit() }}
+        </div>
+    </form>
+</body>
+</html>

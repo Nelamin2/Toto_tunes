@@ -26,38 +26,36 @@
         <div class="row mt-3">
             <!-- Categories list -->
             <div class="col-md-3">
-                <a href="{{ url_for('game_dashboard', child_id=child_id, category_id=1) }}" class="btn btn-lg btn-block btn-primary">Alphabet</a>
+                <a href="{{ url_for('game.select_category', child_id=child_id, category_id=1) }}" class="btn btn-lg btn-block btn-primary">Alphabet</a>
             </div>
             <div class="col-md-3">
-                <a href="{{ url_for('game_dashboard', child_id=child_id, category_id=2) }}" class="btn btn-lg btn-block btn-success">Colors</a>
+                <a href="{{ url_for('game.select_category', child_id=child_id, category_id=2) }}" class="btn btn-lg btn-block btn-success">Colors</a>
             </div>
             <div class="col-md-3">
-                <a href="{{ url_for('game_dashboard', child_id=child_id, category_id=3) }}" class="btn btn-lg btn-block btn-info">Numbers</a>
+                <a href="{{ url_for('game.select_category', child_id=child_id, category_id=3) }}" class="btn btn-lg btn-block btn-info">Numbers</a>
             </div>
             <div class="col-md-3">
-                <a href="{{ url_for('game_dashboard', child_id=child_id, category_id=4) }}" class="btn btn-lg btn-block btn-warning">Shapes</a>
+                <a href="{{ url_for('game.select_category', child_id=child_id, category_id=4) }}" class="btn btn-lg btn-block btn-warning">Shapes</a>
             </div>
             <div class="col-md-3 mt-3">
-                <a href="{{ url_for('game_dashboard', child_id=child_id, category_id=5) }}" class="btn btn-lg btn-block btn-danger">Animals</a>
+                <a href="{{ url_for('game.select_category', child_id=child_id, category_id=5) }}" class="btn btn-lg btn-block btn-danger">Animals</a>
             </div>
             <div class="col-md-3 mt-3">
-                <a href="{{ url_for('game_dashboard', child_id=child_id, category_id=6) }}" class="btn btn-lg btn-block btn-dark">Vehicles</a>
+                <a href="{{ url_for('game.select_category', child_id=child_id, category_id=6) }}" class="btn btn-lg btn-block btn-dark">Vehicles</a>
             </div>
             <div class="col-md-3 mt-3">
-                <a href="{{ url_for('game_dashboard', child_id=child_id, category_id=7) }}" class="btn btn-lg btn-block btn-secondary">Fruits</a>
+                <a href="{{ url_for('game.select_category', child_id=child_id, category_id=7) }}" class="btn btn-lg btn-block btn-secondary">Fruits</a>
             </div>
             <div class="col-md-3 mt-3">
-                <a href="{{ url_for('game_dashboard', child_id=child_id, category_id=8) }}" class="btn btn-lg btn-block btn-primary">Vegetables</a>
+                <a href="{{ url_for('game.select_category', child_id=child_id, category_id=8) }}" class="btn btn-lg btn-block btn-primary">Vegetables</a>
             </div>
             <div class="col-md-3 mt-3">
-                <a href="{{ url_for('game_dashboard', child_id=child_id, category_id=9) }}" class="btn btn-lg btn-block btn-info">Human Body</a>
+                <a href="{{ url_for('game.select_category', child_id=child_id, category_id=9) }}" class="btn btn-lg btn-block btn-info">Human Body</a>
             </div>
         </div>
 
         <!-- Back to profiles button in the bottom right corner -->
-        <a href="{{ url_for('view_children') }}" class="btn btn-warning bottom-right">Back to Profiles</a>
+        <a href="{{ url_for('auth.view_children') }}" class="btn btn-warning bottom-right">Back to Profiles</a>
     </div>
 </body>
 </html>
-
-

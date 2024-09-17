@@ -18,9 +18,17 @@ class RegisterForm(FlaskForm):
     confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), Length(min=6), EqualTo('password', message='password doesn\'t match')])
     submit = SubmitField('Register')
 
+from flask_wtf.file import FileField, FileAllowed  # Import the necessary module
+
 class ChildProfileForm(FlaskForm):
     """ Form for parents to create a child profile """
     username = StringField('Child Username', validators=[DataRequired()])
     gender = SelectField('Gender', choices=[('male', 'Male'), ('female', 'Female')], validators=[DataRequired()])
     age = IntegerField('Age', validators=[DataRequired(), NumberRange(min=1, max=100)])
     submit = SubmitField('Create Profile')
+    
+class ElementForm(FlaskForm):
+    image_file = FileField('Image File', validators=[FileAllowed(['jpg', 'png'])])
+    audio_file = FileField('Audio File', validators=[FileAllowed(['mp3'])])
+    category_id = SelectField('Category', coerce=int, validators=[DataRequired()])
+    submit = SubmitField('Upload')

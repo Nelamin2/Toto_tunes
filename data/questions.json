@@ -1,0 +1,18 @@
+[
+    {
+        "category": "fruits",
+        "correct": "orange",
+        "options": ["apple", "mango", "orange"]
+    },
+    {
+        "category": "animals",
+        "correct": "dog",
+        "options": ["cat", "dog", "cow"]
+    },
+    {
+        "category": "vehicles",
+        "correct": "car",
+        "options": ["bike", "car", "train"]
+    }
+    // Add more questions here as needed
+]
