@@ -6,8 +6,10 @@ from config import Config
 from .models import db, User
 from flask_argon2 import Argon2
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 
 login_manager = LoginManager()
+migrate = Migrate()
 
 def create_app():
     """ Create and configure the app """
@@ -23,6 +25,7 @@ def create_app():
     db.init_app(app)
     #bcrypt.init_app(app)
     login_manager.init_app(app)
+    migrate.init_app(app, db)  # Corrected variable name from 'migirate' to 'migrate'
 
     # Create database tables
     with app.app_context():
