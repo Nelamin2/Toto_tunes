@@ -1,5 +1,7 @@
 """ Main application package """
+import logging
 from flask import Flask
+from sqlalchemy.engine import Engine
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from config import Config
@@ -17,19 +19,22 @@ def create_app():
 
     app = Flask(__name__)
     #app configuration
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///new_site.db'
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
     app.config['SECRET_KEY'] = '13bb2a29bc310ad29aee814ab700698936c459511f664d96f077bc9421e47a0c'
 
-
+    # Set up logging for SQLAlchemy
+    logging.basicConfig()
+    logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
     # Initialize extensions
     db.init_app(app)
+    migrate.init_app(app, db)
+
     #bcrypt.init_app(app)
     login_manager.init_app(app)
-    migrate.init_app(app, db)  # Corrected variable name from 'migirate' to 'migrate'
 
     # Create database tables
-    with app.app_context():
-        db.create_all()
+    
 
     # Import and register blueprints
     from .auth.routes import auth  # Blueprint imports
