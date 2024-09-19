@@ -17,12 +17,10 @@ def create_app():
     app.config['SECRET_KEY'] = '13bb2a29bc310ad29aee814ab700698936c459511f664d96f077bc9421e47a0c'
 
     # Set up logging for SQLAlchemy
-    logging.basicConfig()
-    logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
-    
+    Migrate(app, db)  # Import and initialize 'migrate'
+
     # Initialize extensions
     db.init_app(app)
-    migrate.init_app(app, db)
     login_manager.init_app(app)
 
     # Import and register blueprints
@@ -30,7 +28,7 @@ def create_app():
     from .game.routes import game
     app.register_blueprint(auth)
     app.register_blueprint(game)
-
+    
     return app
 
 # User loader callback for Flask-Login
