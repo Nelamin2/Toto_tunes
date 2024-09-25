@@ -85,7 +85,7 @@
 
         <!-- Control buttons -->
         <div class="mt-3">
-            <button id="listen-button" class="btn btn-success">🔊 Listen</button>
+            <button id="listen-button" class="btn btn-success" onclick="playAudio()">🔊 Listen</button>
             <button class="btn btn-danger" onclick="exitGame()">Exit Game</button>
             <button class="btn btn-secondary" onclick="window.location.href='{{ url_for('game.categories', profile_id=child_id) }}'">Back to Categories</button>
         </div>
@@ -99,22 +99,19 @@
         var correctAnswer = "{{ correct_element.id }}";  // Dynamically passed correct answer
         var audio = new Audio("{{ audio_url }}");  // Prepare the element audio
         var bravoAudio = new Audio("{{ url_for('static', filename='audio/bravo.mp3') }}");  // Prepare the bravo audio
-        
+
         // Play audio when the page loads
         document.addEventListener('DOMContentLoaded', function() {
-            audio.play().catch(function(error) {
-                console.log("Audio playback failed: ", error);
-            });
+            playAudio();  // Automatically play audio on page load
         });
 
-        // Play audio when the "Listen" button is clicked
-        document.getElementById('listen-button').onclick = function() {
+        function playAudio() {
             audio.play().catch(function(error) {
                 console.log("Audio playback failed: ", error);
             });
             startTimer();  // Start the timer after audio plays
             document.getElementById('timer').style.display = 'block';  // Show the timer
-        };
+        }
 
         function startTimer() {
             timeLeft = 20;
@@ -170,3 +167,4 @@
     </script>
 </body>
 </html>
+
