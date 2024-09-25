@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preview Elements and Images</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .preview-container {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .element-preview {
+            margin: 10px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            width: 200px;
+            text-align: center;
+        }
+        .element-preview img {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            display: block;
+            margin: 0 auto;
+        }
+        .status {
+            font-weight: bold;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Preview All Elements and Their Images</h1>
+    <div class="preview-container" id="preview-container"></div>
+
+    <script>
+        // Simulated data with element names and image URLs
+        var elements = [
+            { name: "Element 1", imgUrl: "path_to_image_1.jpg" },
+            { name: "Element 2", imgUrl: "path_to_image_2.jpg" },
+            { name: "Element 3", imgUrl: "path_to_image_3.jpg" },
+            { name: "Element 4", imgUrl: "path_to_image_4.jpg" },
+            { name: "Element 5", imgUrl: "path_to_image_5.jpg" }
+        ];
+
+        // Function to create preview elements with image validation
+        function previewElements() {
+            var container = document.getElementById('preview-container');
+
+            elements.forEach(function(element) {
+                // Create a div for each element preview
+                var elementDiv = document.createElement('div');
+                elementDiv.classList.add('element-preview');
+
+                // Create and add the element name
+                var elementName = document.createElement('p');
+                elementName.innerText = element.name;
+                elementDiv.appendChild(elementName);
+
+                // Create and add the image
+                var img = document.createElement('img');
+                img.src = element.imgUrl;
+                img.alt = element.name + " image";
+                elementDiv.appendChild(img);
+
+                // Create a status message for image load/error
+                var status = document.createElement('p');
+                status.classList.add('status');
+                elementDiv.appendChild(status);
+
+                // Handle image load success
+                img.onload = function() {
+                    status.innerText = "Image loaded successfully";
+                    status.style.color = "green";
+                };
+
+                // Handle image load error
+                img.onerror = function() {
+                    status.innerText = "Image not found!";
+                    status.style.color = "red";
+                };
+
+                // Append the element preview to the container
+                container.appendChild(elementDiv);
+            });
+        }
+
+        // Call the function to preview all elements and their images
+        previewElements();
+    </script>
+
+</body>
+</html>

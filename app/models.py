@@ -3,6 +3,7 @@ from datetime import datetime
 from flask_login import UserMixin
 #from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import Column, DateTime
 #from flask_bcrypt import Bcrypt
 #initilize db object
 from flask_argon2 import Argon2
@@ -26,6 +27,7 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)  # Keep password_hash to match the database column
     children = db.relationship('ChildProfile', backref='parent', lazy=True)
+    created_at = Column(DateTime, default=datetime.utcnow)  # Add this line
     def __repr__(self):
         return f"User('{self.email}')"
 
@@ -50,6 +52,7 @@ class ChildProfile(db.Model):
     age = db.Column(db.Integer, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     scores = db.relationship('Score', backref='child', lazy=True)
+    created_at = Column(DateTime, default=datetime.utcnow)  # Add this line
 
     def __repr__(self):
         return f"ChildProfile('{self.username}', '{self.age}', '{self.gender}')"
@@ -68,6 +71,7 @@ class Category(db.Model):
     name = db.Column(db.String(50), nullable=False)
     icon = db.Column(db.String(100), nullable=False)
     elements = db.relationship('Element', backref='category', lazy=True)
+    created_at = Column(DateTime, default=datetime.utcnow)  # Add this line
 
     def __repr__(self):
         return f"Category('{self.name}')"
@@ -81,13 +85,15 @@ class Element(db.Model):
         Returns:  element object with image_file, text_description, category_id, and date_added"""
     id = db.Column(db.Integer, primary_key=True)
     image_file = db.Column(db.String(100), nullable=False)
+    audio_file = db.Column(db.String(100), nullable=False)
     text_description = db.Column(db.String(255), nullable=False)  # New field for description or text
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=False)
     date_added = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.utcnow)  # Add this line
 
     def __repr__(self):
         """ Return element object as string"""
-        return f"Element('{self.image_file}', '{self.text_description}', '{self.category.name}')"
+        return f"Element('{self.image_file}',  '{self.audio_file}', '{self.text_description}', '{self.category.name}')"
 
 
 # Score model
@@ -100,6 +106,7 @@ class Score(db.Model):
     child_id = db.Column(db.Integer, db.ForeignKey('child_profile.id'), nullable=False)
     score = db.Column(db.Integer, nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.utcnow)  # Add this line
 
     def __repr__(self):
         return f"Score('{self.child.username}', '{self.score}', '{self.timestamp}')"

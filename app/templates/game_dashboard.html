@@ -4,101 +4,169 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Game Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <script src="https://code.responsivevoice.org/responsivevoice.js?key=YOUR_API_KEY"></script> <!-- Replace YOUR_API_KEY with your actual key -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* CSS for shaking effect */
+        .shake {
+            animation: shake-animation 0.5s;
+            animation-iteration-count: 1;
+        }
+
+        @keyframes shake-animation {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+
+        /* CSS for glowing effect */
+        .glow {
+            box-shadow: 0 0 15px rgba(255, 255, 0, 0.8);
+            border-color: #FFD700;
+        }
+
+        /* Timer styles */
+        #timer {
+            font-size: 1.5rem; 
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        /* Title styles */
+        h1 {
+            font-size: 2.5rem; 
+            color: #4A90E2;
+            text-align: center; 
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
+        }
+
+        /* Child-friendly "Bravo!" styling */
+        .bravo-message {
+            font-size: 2rem;
+            color: #28a745;
+            text-align: center;
+            animation: pop 0.5s ease-in-out;
+        }
+
+        @keyframes pop {
+            0% { transform: scale(0.5); }
+            100% { transform: scale(1); }
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <h1>Welcome {{ child.username }}</h1>
-        <h2>Category: {{ category.name }}</h2>
-    </header>
+    <div class="container mt-5" id="game-container">
+        <h1>Match the Sound</h1>
 
-    <main>
-        <h3>Listen to the word and select the matching image:</h3>
-        <button id="play-audio">Play Audio</button>
-
-        <div class="options" id="options-container">
-            <!-- Images will be dynamically inserted here -->
+        <div class="row" id="images-container">
+            <!-- Dynamically populate the elements (images) -->
+            {% for element in elements %}
+            <div class="col-md-4">
+                <button id="{{ element.id }}" class="btn btn-lg btn-primary" onclick="submitAnswer('{{ element.id }}')">
+                    <img src="{{ url_for('static', filename='image/' + element.image_file) }}" class="img-fluid" alt="{{ element.text_description }}">
+                </button>
+            </div>
+            {% endfor %}
         </div>
 
-        <p>Time left: <span id="timer">15</span> seconds</p>
-    </main>
+        <!-- Timer -->
+        <div id="timer" style="display: none;">20 seconds remaining <span>⏳</span></div>
+
+        <!-- Result message -->
+        <div id="result"></div>
+
+        <!-- Control buttons -->
+        <div class="mt-3">
+            <button id="listen-button" class="btn btn-success">🔊 Listen</button>
+            <button class="btn btn-danger" onclick="exitGame()">Exit Game</button>
+            <button class="btn btn-secondary" onclick="window.location.href='{{ url_for('game.categories', profile_id=child_id) }}'">Back to Categories</button>
+        </div>
+    </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            fetchQuestions('{{ category.id }}');
+        var maxRounds = 10;  // Limit to 10 rounds
+        var currentRound = 0;  // Track the current round
+        var timeLeft = 20;  // Timer duration set to 20 seconds
+        var timerId;
+        var correctAnswer = "{{ correct_element.id }}";  // Dynamically passed correct answer
+        var audio = new Audio("{{ audio_url }}");  // Prepare the element audio
+        var bravoAudio = new Audio("{{ url_for('static', filename='audio/bravo.mp3') }}");  // Prepare the bravo audio
+        
+        // Play audio when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            audio.play().catch(function(error) {
+                console.log("Audio playback failed: ", error);
+            });
         });
 
-        function fetchQuestions(category) {
-            fetch(`/questions/${category}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.length > 0) {
-                        const question = data[0]; // Assuming you are using the first question
-                        const audioText = question.options.find(opt => opt.id === question.correct_answer_id).name;
-                        document.getElementById('play-audio').onclick = () => playAudio(audioText);
-                        renderOptions(question.options, question.correct_answer_id);
-                    }
-                })
-                .catch(error => console.error('Error fetching questions:', error));
-        }
-
-        function playAudio(text) {
-            responsiveVoice.speak(text, "US English Female");
-        }
-
-        function renderOptions(options, correctId) {
-            const container = document.getElementById('options-container');
-            container.innerHTML = ''; // Clear any existing options
-
-            options.forEach(option => {
-                const img = document.createElement('img');
-                img.src = `{{ url_for('static', filename='images/') }}${option.image}`;
-                img.alt = option.name;
-                img.onclick = () => selectImage(option.id, correctId);
-
-                const div = document.createElement('div');
-                div.className = 'option';
-                div.appendChild(img);
-                container.appendChild(div);
+        // Play audio when the "Listen" button is clicked
+        document.getElementById('listen-button').onclick = function() {
+            audio.play().catch(function(error) {
+                console.log("Audio playback failed: ", error);
             });
+            startTimer();  // Start the timer after audio plays
+            document.getElementById('timer').style.display = 'block';  // Show the timer
+        };
+
+        function startTimer() {
+            timeLeft = 20;
+            document.getElementById('timer').innerHTML = timeLeft + ' seconds remaining <span>⏳</span>';
+            timerId = setInterval(countdown, 1000);  // Call countdown every second
         }
 
-        function selectImage(selectedId, correctId) {
-            // Prepare form data
-            const form = document.createElement('form');
-            form.method = 'post';
-            form.action = "{{ url_for('game.submit_answer', child_id=child.id, category_id=category.id) }}";
-
-            const selectedInput = document.createElement('input');
-            selectedInput.type = 'hidden';
-            selectedInput.name = 'selected_image_id';
-            selectedInput.value = selectedId;
-            form.appendChild(selectedInput);
-
-            const correctInput = document.createElement('input');
-            correctInput.type = 'hidden';
-            correctInput.name = 'correct_image_id';
-            correctInput.value = correctId;
-            form.appendChild(correctInput);
-
-            document.body.appendChild(form);
-            form.submit();
-        }
-
-        // Countdown timer
-        let timeLeft = 15;
-        const timerElement = document.getElementById('timer');
-        const timerInterval = setInterval(function() {
-            timeLeft -= 1;
-            timerElement.textContent = timeLeft;
+        function countdown() {
             if (timeLeft <= 0) {
-                clearInterval(timerInterval);
-                // Auto-submit if no selection was made
-                selectImage(-1, {{ correct_element.id }});
+                clearInterval(timerId); // Stop the timer
+                highlightCorrectAnswer(); // Automatically highlight and shake the correct answer
             }
-        }, 1000);
+            document.getElementById('timer').innerHTML = timeLeft + ' seconds remaining <span>⏳</span>';
+            timeLeft--;
+        }
+
+        function submitAnswer(selectedId) {
+            // Check if the selected answer is correct
+            if (selectedId == correctAnswer) {
+                document.getElementById(selectedId).classList.add('glow');  // Glow effect for correct answer
+                bravoAudio.play().catch(function(error) {
+                    console.log("Bravo audio playback failed: ", error);
+                });
+                // Update score and move to the next question
+                setTimeout(fetchNewQuestion, 2000);  // Delay for next question
+            } else {
+                // Shake effect for incorrect answers
+                document.getElementById(selectedId).classList.add('shake');
+                setTimeout(function() {
+                    document.getElementById(selectedId).classList.remove('shake');
+                }, 500);
+            }
+        }
+
+        // Fetch a new question from the server
+        function fetchNewQuestion() {
+            fetch('{{ url_for('game.fetch_new_question', child_id=child_id, category_id=category_id) }}')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update the elements and correct answer
+                    document.getElementById('images-container').innerHTML = data.images_html;
+                    correctAnswer = data.correct_answer_id;  // Update correct answer for the next round
+                    audio = new Audio(data.audio_url);  // Update audio for the next round
+                    currentRound++;  // Increment round
+                } else {
+                    // No more questions, redirect to the results page
+                    window.location.href = "{{ url_for('game.result', profile_id=child_id, category_id=category_id) }}";
+                }
+            })
+            .catch(error => console.error('Error fetching new question:', error));
+        }
     </script>
 </body>
 </html>
-

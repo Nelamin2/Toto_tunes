@@ -1,27 +1,21 @@
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
+"""  Script to create the necessary tables in the database. """
+from app import create_app, db  # Import the app and db from your app module
 import logging
 
+# Enable logging for SQLAlchemy engine to track SQL queries
 logging.basicConfig()
 logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'  # Make sure this path is correct
-db = SQLAlchemy(app)
-
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password_hash = db.Column(db.String(128), nullable=False)
-
 def create_tables():
-    try:
-        with app.app_context():
-            print("Creating tables...")
-            db.create_all()
-            print("Tables created.")
-    except Exception as e:
-        print(f"Error creating tables: {e}")
+    """Function to drop and create the necessary tables in the database."""
+    app = create_app()  # Create the app
+    with app.app_context():
+        print("Dropping tables...")
+        db.drop_all()  # Drop all existing tables
+        print("Tables dropped.")
+        print("Creating tables...")
+        db.create_all()  # Create all tables based on the models
+        print("Tables created.")
 
 if __name__ == "__main__":
     create_tables()

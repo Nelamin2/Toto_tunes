@@ -1,7 +1,8 @@
-import random  # Import the 'random' module
-from flask import jsonify, Blueprint, render_template, session, redirect, url_for, flash, request
+""" Game routes for the application """
+from flask import Blueprint, render_template, session, redirect, url_for, flash, request, jsonify
 from flask_login import login_required
-from ..models import db, ChildProfile, Category, Element
+from ..models import db, ChildProfile, Category, Element, Score
+import random
 
 game = Blueprint('game', __name__)
 
@@ -18,93 +19,138 @@ def categories(profile_id):
     child = ChildProfile.query.get_or_404(profile_id)
     return render_template('categories.html', categories=game_categories, child_name=child.username, child_id=child.id)
 
-@game.route('/select_category/<int:child_id>/<int:category_id>')
-@login_required
-def select_category(child_id, category_id):
-    """ Select a specific category and redirect to the game dashboard """
-    # Ensure the child_id is in the session
-    if not session.get('child_id'):
-        session['child_id'] = child_id
-
-    return redirect(url_for('game.game_dashboard', child_id=child_id, category_id=category_id))
-
-@game.route('/generate_audio/<text>', methods=['GET'])
-@login_required
-def generate_audio(text):
-    """ Generate an audio file for the given text """
-    # Construct the URL for the Responsive API
-    audio_url = f"https://code.responsivevoice.org/getvoice.php?t={text}&tl=en&sv=male&key=SzVfLas9"
-    return jsonify({'audio_url': audio_url})
-
 @game.route('/about')
 def about():
     """ Show the about page """
     return render_template('about.html')
 
+@game.route('/select_category/<int:child_id>/<int:category_id>')
+@login_required
+def select_category(child_id, category_id):
+    """ Select a specific category and reset the game for that category """
+    session['child_id'] = child_id
+    session['score'] = 0
+    session['current_round'] = 1
+    return redirect(url_for('game.game_dashboard', child_id=child_id, category_id=category_id))
+
 @game.route('/game_dashboard/<int:child_id>/<int:category_id>')
 @login_required
 def game_dashboard(child_id, category_id):
-    """ Show the game dashboard with the images and words """
-    child = ChildProfile.query.get_or_404(child_id)
+    """ Show the game dashboard with a random question for the selected category """
     category = Category.query.get_or_404(category_id)
 
-    # Get a random element for the category
-    correct_element = Element.query.filter_by(category_id=category.id).order_by(db.func.random()).first()
-
-    # Generate audio URL for the correct element
-    audio_url = url_for('generate_audio', text=correct_element.text_description)
-
-    # Select two random incorrect elements (not the correct one)
-    incorrect_elements = Element.query.filter(Element.category_id == category.id, Element.id != correct_element.id).order_by(db.func.random()).limit(2).all()
-
-    # Combine correct and incorrect elements
-    elements = incorrect_elements + [correct_element]
-
-    # Shuffle elements so the correct one isn't always last
-    random.shuffle(elements)
-
-    # Pass the data to the template
-    return render_template('dashboard.html', child=child, elements=elements, category=category, correct_element=correct_element, audio_url=audio_url)
-
-@game.route('/submit_answer/<int:child_id>/<int:category_id>', methods=['POST'])
-@login_required
-def submit_answer(child_id, category_id):
-    """ Handles the answer submission and scoring """
-    selected_image_id = request.form.get('selected_image_id')  # Get the selected image ID
-    correct_image_id = request.form.get('correct_image_id')  # Get the correct image ID
-
-    if selected_image_id == correct_image_id:
-        # Increase the score
-        session['score'] = session.get('score', 0) + 1
-        flash('Correct! Good job!', 'success')
-    else:
-        flash('Oops! The correct answer was the other one.', 'error')
-
-    # Move to the next round or show the final result if this is the last round
-    if get_next_round():
-        return redirect(url_for('game.game_dashboard', child_id=child_id, category_id=category_id))
-    else:
+    # Check if the game has already reached the maximum rounds
+    if session.get('current_round', 1) > 10:
         return redirect(url_for('game.result', child_id=child_id))
 
-@game.route('/result/<int:child_id>')
+    # Randomly select the correct element
+    correct_element = Element.query.filter_by(category_id=category.id).order_by(db.func.random()).first()
+
+    # Handle the case where no element is found
+    if not correct_element or not correct_element.audio_file:
+        flash('No audio available for this element', 'error')
+        return redirect(url_for('game.categories', profile_id=child_id))
+
+    # Use a static audio file based on the correct element's description
+    audio_url = url_for('static', filename='audio/' + correct_element.audio_file)
+
+    # Randomly select two incorrect elements
+    incorrect_elements = Element.query.filter(
+        Element.category_id == category.id,
+        Element.id != correct_element.id
+    ).order_by(db.func.random()).limit(2).all()
+
+    elements = incorrect_elements + [correct_element]
+    random.shuffle(elements)  # Shuffle the order
+
+    return render_template(
+        'game_dashboard.html', 
+        elements=elements,
+        correct_element=correct_element,
+        audio_url=audio_url,
+        child_id=child_id,
+        category_id=category_id,
+        profile_id=child_id,
+        score=session.get('score', 0)  # Pass the score to the template
+    )
+
+
+
+@game.route('/fetch_new_question/<int:child_id>/<int:category_id>', methods=['GET'])
 @login_required
-def result(child_id):
-    """ Shows the final score and resets the game session """
+def fetch_new_question(child_id, category_id):
+    """ Fetch a new question for the game """
+    category = Category.query.get_or_404(category_id)
+
+    # Retrieve current round from session
+    current_round = session.get('current_round', 1)
+
+    # Check if maximum rounds have been reached
+    if current_round > 10:
+        return jsonify(success=False)  # No more questions available
+
+    # Randomly select the correct element
+    correct_element = Element.query.filter_by(category_id=category.id).order_by(db.func.random()).first()
+
+    # Handle case where no element is found
+    if not correct_element or not correct_element.audio_file:
+        return jsonify(success=False)
+
+    # Prepare images for the response
+    incorrect_elements = Element.query.filter(
+        Element.category_id == category.id,
+        Element.id != correct_element.id
+    ).order_by(db.func.random()).limit(2).all()
+
+    # Ensure we have 2 incorrect answers to return with the correct answer
+    if len(incorrect_elements) < 2:
+        return jsonify(success=False)
+
+    elements = incorrect_elements + [correct_element]
+    random.shuffle(elements)  # Shuffle the order of elements
+
+    # Prepare the HTML for the images
+    images_html = ''.join(
+        f'<div class="col-md-4">'
+        f'<button id="{element.id}" class="btn btn-lg btn-primary" onclick="submitAnswer(\'{element.id}\')">'
+        f'<img src="{url_for("static", filename="image/" + element.image_file)}" class="img-fluid" alt="{element.text_description}">'
+        f'</button>'
+        f'</div>'
+        for element in elements
+    )
+
+    # Prepare the audio URL
+    audio_url = url_for('static', filename='audio/' + correct_element.audio_file)
+
+    # Return the success response with the necessary data
+    return jsonify(success=True, images_html=images_html, category_id=category_id, correct_answer_id=correct_element.id, audio_url=audio_url)
+
+
+@game.route('/fetch_score/<int:child_id>', methods=['GET'])
+@login_required
+def fetch_score(child_id, category_id):
+    """ Fetch the current score """
+    score_record = Score.query.filter_by(child_id=child_id, category_id=category_id).first()
+    if score_record:
+        return jsonify(score=score_record.score)
+    else:
+        return jsonify(score=0)
+
+@game.route('/result/<int:profile_id>/<int:category_id>', methods=['GET'])
+@login_required
+def result(profile_id, category_id):
+    """ Show the result page with the final score """
     score = session.get('score', 0)
+    total_rounds = 10
 
     # Clear session variables for a new game
     session.pop('current_round', None)
     session.pop('used_image_ids', None)
     session.pop('score', None)
 
-    return render_template('result.html', child_id=child_id, score=score)
+    return render_template('result.html', child_id=profile_id, category_id=category_id, score=score, total_rounds=total_rounds)
 
-def get_next_round():
-    """ Logic to decide whether to continue to the next round or end the game """
-    current_round = session.get('current_round', 1)
-    total_rounds = 10  # Example: 10 rounds per game
-    if current_round < total_rounds:
-        session['current_round'] = current_round + 1
-        return True
-    else:
-        return False
+@game.route('/exit_game/<int:profile_id>', methods=['GET'])
+def exit_game():
+    """ Exit the game and redirect to the main page """
+    return redirect(url_for('auth.home'))

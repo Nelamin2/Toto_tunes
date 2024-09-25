@@ -1,38 +1,38 @@
-import logging
+import os
 from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
-from config import Config
-from .models import db, User
-from flask_argon2 import Argon2
 from flask_migrate import Migrate
+from config import Config
+from .models import db, User  # Import your models
 
+# Initialize login manager
 login_manager = LoginManager()
 
 def create_app():
-    """ Create and configure the app """
+    """Create and configure the Flask application."""
     app = Flask(__name__)
     
-    # App configuration
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
+    # Use an absolute path for the SQLite database
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, '../site.db')
     app.config['SECRET_KEY'] = '13bb2a29bc310ad29aee814ab700698936c459511f664d96f077bc9421e47a0c'
-
-    # Set up logging for SQLAlchemy
-    Migrate(app, db)  # Import and initialize 'migrate'
-
+    
     # Initialize extensions
-    db.init_app(app)
-    login_manager.init_app(app)
+    db.init_app(app)  # Initialize the database with the app
+    login_manager.init_app(app)  # Initialize the login manager
+    Migrate(app, db)  # Initialize migrations for database management
 
-    # Import and register blueprints
-    from .auth.routes import auth  # Blueprint imports
-    from .game.routes import game
+    # Register blueprints
+    from .auth.routes import auth  # Assuming auth blueprint exists
+    from .game.routes import game  # Assuming game blueprint exists
     app.register_blueprint(auth)
     app.register_blueprint(game)
     
     return app
 
-# User loader callback for Flask-Login
+# Flask-Login user loader callback
 @login_manager.user_loader
 def load_user(user_id):
-    """ Load user by ID """
+    """Load user by ID."""
     return User.query.get(int(user_id))

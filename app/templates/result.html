@@ -3,32 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Result</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <script src="https://code.responsivevoice.org/responsivevoice.js?key=YOUR_API_KEY"></script> <!-- Include ResponsiveVoice -->
-    <script>
-        function speakResult(score) {
-            responsiveVoice.speak("Game over! Your score is " + score, "UK English Male");
+    <title>Game Results</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', sans-serif;
+            background-color: #f0f8ff;
+            text-align: center;
+            padding: 20px;
         }
-    </script>
+
+        h1 {
+            color: #ff6347;
+            font-size: 3em;
+            animation: bounce 1s infinite alternate;
+        }
+
+        .score {
+            font-size: 2.5em;
+            color: #32cd32;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .message {
+            font-size: 1.8em;
+            margin: 20px 0;
+        }
+
+        .stars {
+            font-size: 3em;
+            color: gold;
+            animation: twinkle 1.5s infinite;
+        }
+
+        @keyframes bounce {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-20px); }
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .button {
+            background-color: #ff4500;
+            color: white;
+            padding: 10px 20px;
+            font-size: 1.5em;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 30px;
+        }
+
+        .button:hover {
+            background-color: #ff6347;
+        }
+    </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <h1>Game Over!</h1>
-        <p>Your score: {{ score }}</p>
-        
-        <!-- Start over -->
-        <a href="{{ url_for('game_dashboard', child_id=session.get('child_id'), category_id=session.get('category_id')) }}" class="btn btn-success">Start Over</a>
-        
-        <!-- Back to dashboard -->
-        <a href="{{ url_for('dashboard') }}" class="btn btn-warning">Back to Dashboard</a>
-        
-        <script>
-            // Speak the result when the page loads
-            window.onload = function() {
-                speakResult("{{ score }}");
-            };
-        </script>
-    </div>
+    <h1>Congratulations!</h1>
+    
+    <!-- Score display -->
+    <div class="score">Your Score: {{ score }} out of {{ total_rounds }}</div>
+
+    {% if score == total_rounds %}
+        <p class="message">🌟 Amazing job! You're a superstar! 🌟</p>
+        <div class="stars">✨✨✨✨✨✨✨✨✨✨</div>
+    {% elif score >= total_rounds / 2 %}
+        <p class="message">🎉 Great effort! Keep it up, you're doing wonderfully! 🎉</p>
+        <div class="stars">⭐️⭐️⭐️⭐️⭐️</div>
+    {% else %}
+        <p class="message">👍 Good try! Every effort counts! Let's play again! 👍</p>
+        <div class="stars">⭐️⭐️⭐️</div>
+    {% endif %}
+    
+    <a href="{{ url_for('game.game_dashboard', category_id=category_id, child_id=child_id, profile_id=child_id) }}">
+        <button class="button">Play Again!</button>
+    </a>
+    
 </body>
 </html>
+
