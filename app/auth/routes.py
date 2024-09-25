@@ -1,9 +1,9 @@
 """ Routes for the authentication blueprint """ 
 from flask import Blueprint, render_template, redirect, url_for, flash, request, session
 from flask_login import logout_user, login_required, current_user, login_user
-from .forms import LoginForm, RegisterForm, ChildProfileForm
-from ..models import User, ChildProfile
-from .. import db
+from app.auth.forms import LoginForm, RegisterForm, ChildProfileForm
+from app.models import User, ChildProfile
+from app import db
 auth = Blueprint('auth', __name__)
 
 # Login route
