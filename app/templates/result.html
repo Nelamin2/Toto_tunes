@@ -69,6 +69,7 @@
     <!-- Score display -->
     <div class="score">Your Score: {{ score }} out of {{ total_rounds }}</div>
 
+    <!-- Feedback based on score -->
     {% if score == total_rounds %}
         <p class="message">🌟 Amazing job! You're a superstar! 🌟</p>
         <div class="stars">✨✨✨✨✨✨✨✨✨✨</div>
@@ -80,10 +81,10 @@
         <div class="stars">⭐️⭐️⭐️</div>
     {% endif %}
     
+    <!-- Button to restart the game -->
     <a href="{{ url_for('game.game_dashboard', category_id=category_id, child_id=child_id, profile_id=child_id) }}">
         <button class="button">Play Again!</button>
     </a>
     
 </body>
 </html>
-

@@ -75,6 +75,11 @@ def game_dashboard(child_id, category_id):
     )
 
 
+@game.route('/update_score/<int:score>', methods=['POST'])
+@login_required
+def update_score(score):
+    session['score'] = score
+    return jsonify(success=True)
 
 @game.route('/fetch_new_question/<int:child_id>/<int:category_id>', methods=['GET'])
 @login_required

@@ -179,6 +179,11 @@
             }
         }
 
+        // Function to exit the game and return to a home or menu page
+        function exitGame() {
+            window.location.href = "{{ url_for('game.home') }}";  // Redirect to home or desired page
+        }
+
         // Fetch a new question from the server
         function fetchNewQuestion() {
             fetch('{{ url_for('game.fetch_new_question', child_id=child_id, category_id=category_id) }}')
@@ -200,5 +205,3 @@
     </script>
 </body>
 </html>
-
-
