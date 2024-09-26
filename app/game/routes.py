@@ -159,3 +159,4 @@ def result(profile_id, category_id):
 def exit_game():
     """ Exit the game and redirect to the main page """
     return redirect(url_for('auth.home'))
+

@@ -49,10 +49,29 @@
             max-width: 800px;
             margin: 0 auto;
         }
+        .btn {
+            border-radius: 15px; /* Rounded corners for buttons */
+            margin: 5px;
+            color: #fff;
+        }
+        .btn-home {
+            background-color: #20b2aa; /* Light Sea Green for Home button */
+        }
+        .btn-profiles {
+            background-color: #ff6347; /* Tomato color for Profiles button */
+        }
     </style>
 </head>
 <body>
     <div class="container mt-5">
+        <!-- Navigation Buttons -->
+        <div class="d-flex justify-content-center mb-4">
+            <!-- Home Button -->
+            <a href="{{ url_for('game.home') }}" class="btn btn-home">Home</a>
+            <!-- Profiles Button -->
+            <a href="{{ url_for('auth.view_children') }}" class="btn btn-profiles">Profiles</a>
+        </div>
+
         <h1>🎮 Select a Game Category 🎮</h1>
         <ul class="list-group">
             {% for category in categories %}
@@ -69,4 +88,3 @@
     </div>
 </body>
 </html>
-    

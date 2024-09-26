@@ -129,3 +129,12 @@ def update_child_profile(child_id):
         return redirect(url_for('auth.view_child', child_id=child.id))  # Redirect to the updated child profile
 
     return render_template('edit_profile.html', form=form, child=child)
+
+@auth.route('/delete_child_profile/<int:child_id>', methods=['POST'])
+def delete_child_profile(child_id):
+    # Code to delete the profile by `child_id`
+    profile = ChildProfile.query.get_or_404(child_id)
+    db.session.delete(profile)
+    db.session.commit()
+    flash(f'Profile {profile.username} has been deleted successfully!', 'success')
+    return redirect(url_for('auth.view_children'))  # Redirect to the profiles page
