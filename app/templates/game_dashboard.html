@@ -132,7 +132,8 @@
         var correctAnswer = "{{ correct_element.id }}";  // Dynamically passed correct answer
         var audio = new Audio("{{ audio_url }}");  // Prepare the element audio
         var bravoAudio = new Audio("{{ url_for('static', filename='audio/bravo.mp3') }}");  // Prepare the bravo audio
-
+        var maxRounds = 10;  // Limit to 10 rounds
+        var tryAgainAudio = new Audio("{{ url_for('static', filename='audio/try_again.mp3') }}");  // Prepare the try again audio
         // Play audio when the page loads
         document.addEventListener('DOMContentLoaded', function() {
             playAudio();  // Automatically play audio on page load
@@ -153,37 +154,48 @@
         }
 
         function countdown() {
-            if (timeLeft <= 0) {
-                clearInterval(timerId); // Stop the timer
-                highlightCorrectAnswer(); // Automatically highlight and shake the correct answer
-            }
-            document.getElementById('timer').innerHTML = timeLeft + ' seconds remaining <span>⏳</span>';
-            timeLeft--;
-        }
+    if (timeLeft <= 0) {
+        clearInterval(timerId); // Stop the timer
+        highlightCorrectAnswer(false); // Highlight the correct answer
+        return; // Exit the function to avoid further execution
+    }
+    document.getElementById('timer').innerHTML = timeLeft + ' seconds remaining <span>⏳</span>';
+    timeLeft--;
+}
 
-        function submitAnswer(selectedId) {
-            // Check if the selected answer is correct
-            if (selectedId == correctAnswer) {
-                document.getElementById(selectedId).classList.add('glow');  // Glow effect for correct answer
-                bravoAudio.play().catch(function(error) {
-                    console.log("Bravo audio playback failed: ", error);
-                });
-                // Update score and move to the next question
-                setTimeout(fetchNewQuestion, 2000);  // Delay for next question
-            } else {
-                // Shake effect for incorrect answers
-                document.getElementById(selectedId).classList.add('shake');
-                setTimeout(function() {
-                    document.getElementById(selectedId).classList.remove('shake');
-                }, 500);
-            }
-        }
+function highlightCorrectAnswer() {
+    // Automatically highlight and shake the correct answer
+    document.getElementById(correctAnswer).classList.add('glow');  // Glow effect for correct answer
+    document.getElementById(correctAnswer).classList.add('shake'); // Shake effect for correct answer
+    // Play audio based on the correctness of the answer
+    if (isCorrect) {
+        bravoAudio.play().catch(function(error) {
+            console.log("Bravo audio playback failed: ", error);
+        });
+    } else {
+        tryAgainAudio.play().catch(function(error) {
+            console.log("Try Again audio playback failed: ", error);
+        });
+    }
+
+    // Delay for next question
+    setTimeout(fetchNewQuestion, 2000);  // Delay before loading the next question
+}
+
 
         // Function to exit the game and return to a home or menu page
         function exitGame() {
             window.location.href = "{{ url_for('game.home') }}";  // Redirect to home or desired page
         }
-
+        // Modify the function that handles when the user selects an answer
+        function submitAnswer(selectedId) {
+        // Check if the selected answer is correct
+        if (selectedId === correctAnswer) {
+        highlightCorrectAnswer(true); // Highlight correctly and play "Bravo"
+        } else {
+        highlightCorrectAnswer(false); // Highlight the correct answer and play "Try Again"
+        }
+        }
         // Fetch a new question from the server
         function fetchNewQuestion() {
             fetch('{{ url_for('game.fetch_new_question', child_id=child_id, category_id=category_id) }}')
