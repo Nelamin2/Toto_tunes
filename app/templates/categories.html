@@ -6,23 +6,60 @@
     <title>Select Category</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
+        body {
+            background-color: #f0f8ff; /* Light blue background */
+            font-family: 'Comic Sans MS', cursive, sans-serif; /* Playful font */
+        }
+        h1 {
+            text-align: center;
+            color: #ff6347; /* Tomato color for the header */
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 1px 1px #ffa07a; /* Slight shadow for a fun effect */
+        }
+        .list-group-item {
+            font-size: 1.2em; /* Slightly larger text */
+            padding: 15px;
+            border-radius: 15px; /* Rounded corners for items */
+            background-color: #fffaf0; /* Light background for list items */
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow */
+            margin-bottom: 10px; /* Space between items */
+            transition: transform 0.2s ease; /* Smooth scaling on hover */
+        }
+        .list-group-item:hover {
+            transform: scale(1.05); /* Slightly grow on hover */
+            background-color: #ffe4e1; /* Soft pink hover effect */
+        }
         .category-icon {
-            width: 30px;
-            height: 30px;
-            margin-right: 10px;
+            width: 40px; /* Larger icon */
+            height: 40px;
+            margin-right: 15px;
+            border-radius: 50%; /* Round the icons */
+            object-fit: cover;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); /* Add a shadow around the icon */
+        }
+        a {
+            text-decoration: none; /* Remove underline */
+            color: #ff4500; /* Fun color for links */
+        }
+        a:hover {
+            color: #ff6347; /* Slight change in color on hover */
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
         }
     </style>
 </head>
 <body>
     <div class="container mt-5">
-        <h1>Select a Game Category</h1>
+        <h1>🎮 Select a Game Category 🎮</h1>
         <ul class="list-group">
             {% for category in categories %}
             <li class="list-group-item d-flex align-items-center">
                 {% if category.icon %}
                     <img src="{{ url_for('static', filename=category.icon) }}" alt="{{ category.name }} icon" class="category-icon">
                 {% endif %}
-                <!-- Update to use select_category route -->
                 <a href="{{ url_for('game.select_category', child_id=child_id, category_id=category.id) }}">
                     {{ category.name }}
                 </a>
@@ -32,3 +69,4 @@
     </div>
 </body>
 </html>
+    

@@ -6,6 +6,21 @@
     <title>Game Dashboard</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
+        /* Container Styling */
+        #game-container {
+            background: linear-gradient(135deg, #e0f7fa 0%, #80deea 100%);
+            border-radius: 15px;
+            box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.2);
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        /* General Button Styles */
+        button {
+            margin: 10px;
+            font-size: 1.2rem;
+        }
+
         /* CSS for shaking effect */
         .shake {
             animation: shake-animation 0.5s;
@@ -37,15 +52,33 @@
             font-size: 1.5rem; 
             font-weight: bold;
             margin: 20px 0;
+            background-color: #0288d1;
+            color: #ffffff;
+            padding: 10px 15px;
+            border-radius: 10px;
+            display: inline-block;
         }
 
         /* Title styles */
         h1 {
             font-size: 2.5rem; 
-            color: #4A90E2;
+            color: #00796b;
             text-align: center; 
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
             margin-bottom: 30px;
+        }
+
+        /* Image Button Styles */
+        .btn-primary {
+            background-color: #4caf50;
+            border: 2px solid #388e3c;
+            transition: transform 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+            background-color: #66bb6a;
+            border-color: #43a047;
         }
 
         /* Child-friendly "Bravo!" styling */
@@ -71,7 +104,7 @@
             {% for element in elements %}
             <div class="col-md-4">
                 <button id="{{ element.id }}" class="btn btn-lg btn-primary" onclick="submitAnswer('{{ element.id }}')">
-                    <img src="{{ url_for('static', filename='image/' + element.image_file) }}" class="img-fluid" alt="{{ element.text_description }}">
+                    <img src="{{ url_for('static', filename='image/' + element.image_file) }}" class="img-fluid rounded" alt="{{ element.text_description }}">
                 </button>
             </div>
             {% endfor %}
@@ -167,4 +200,5 @@
     </script>
 </body>
 </html>
+
 

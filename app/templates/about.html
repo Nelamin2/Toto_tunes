@@ -3,18 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About - Toto Tunes</title>
-    <!-- Include Bootstrap CSS or your own stylesheet -->
+    <title>About Toto Tunes</title>
+    <!-- Include Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa; /* Light gray background to match home */
+            font-family: 'Arial', sans-serif;
+        }
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #007bff; /* Blue color for Toto_Tunes brand */
+        }
+        .navbar-brand:hover {
+            text-decoration: none;
+            color: #0056b3; /* Darker blue on hover */
+        }
+        .btn-home {
+            color: #ffffff;
+            background-color: #6c757d; /* Gray button for Home */
+        }
+        .btn-home:hover {
+            background-color: #5a6268; /* Darker gray on hover */
+        }
+        .content {
+            background-color: #ffffff; /* White background for content */
+            padding: 30px;
+            border-radius: 8px; /* Rounded corners */
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); /* Soft shadow */
+            margin-top: 30px;
+        }
+        h1 {
+            color: #007bff; /* Blue color for header */
+            font-weight: bold;
+        }
+        p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #333; /* Darker text color for readability */
+        }
+    </style>
 </head>
 <body>
 
-    <!-- Main Content -->
+    <!-- Navbar for Toto Tunes with Home Button -->
+    <nav class="navbar navbar-light bg-light">
+        <!-- Toto_Tunes Brand -->
+        <a href="{{ url_for('game.home') }}" class="navbar-brand">Toto_Tunes</a>
+        
+        <!-- Home Button (Upper Right Corner) -->
+        <div class="ml-auto">
+            <a href="{{ url_for('game.home') }}" class="btn btn-home">Home</a>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
     <div class="container">
-        <h1 class="mt-5 text-center">About Toto Tunes</h1>
-        <p class="lead text-center">
-            Toto Tunes is an engaging and educational platform that makes learning fun for kids. Through interactive games and audio-visual feedback, children can improve their cognitive skills in a playful way.
-        </p>
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <!-- About Content -->
+                <div class="content text-center">
+                    <h1>About Toto Tunes</h1>
+                    <p>
+                        Welcome to <strong>Toto Tunes</strong>! 🎵 Enhance your child's learning experience with engaging and interactive games.
+                    </p>
+                    <p>
+                        Toto Tunes is designed to blend education and entertainment, making learning a joyful experience for kids. 
+                        With a variety of educational games, children can develop cognitive skills while having fun!
+                    </p>
+                    <p>
+                        Our games cover different themes, from memory exercises to math puzzles, all tailored to suit your child’s learning needs.
+                        We believe in making education accessible, engaging, and impactful.
+                    </p>
+                    <p>
+                        Join us on this journey to empower young learners with creative and playful tools that foster curiosity and growth.
+                    </p>
+                    <p><em>Happy learning with Toto Tunes!</em></p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Optional JavaScript -->

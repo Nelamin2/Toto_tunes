@@ -4,49 +4,103 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Toto Tunes - Home</title>
-    <!-- Include Bootstrap CSS or your own stylesheet -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
-        /* Add custom styles */
+        /* Fun and playful styles */
         body {
-            background-color: #f8f9fa; /* Light gray background */
+            background-color: #f0f8ff; /* Light blue background */
+            font-family: 'Comic Sans MS', cursive, sans-serif; /* Playful font */
+        }
+        .navbar {
+            background-color: #fffaf0; /* Light cream background for the navbar */
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow */
         }
         .navbar-brand {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             font-weight: bold;
-            color: #007bff; /* Blue color for Toto_tunes button */
+            color: #ff6347; /* Tomato color for Toto Tunes */
+            text-shadow: 1px 1px #ffa07a; /* Slight shadow for effect */
         }
         .navbar-brand:hover {
             text-decoration: none;
-            color: #0056b3; /* Darker blue on hover */
+            color: #ff4500; /* Darker shade on hover */
         }
-        .btn-primary {
-            margin-right: 10px;
-        }
-        .btn-about {
+        .btn-about, .btn-logout {
             color: #ffffff;
-            background-color: #6c757d; /* Gray button for About */
+            background-color: #6c757d; /* Gray button for About & Logout */
+            border-radius: 12px; /* Rounded corners */
+            padding: 10px 20px; /* Larger button */
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Button shadow */
+            margin-left: 10px; /* Spacing between buttons */
+        }
+        .btn-about:hover, .btn-logout:hover {
+            background-color: #5a6268; /* Darker gray on hover */
         }
         .about-button {
             position: absolute;
             top: 10px;
-            left: 10px;
+            right: 120px; /* Position About button 120px from right */
+        }
+        .logout-button {
+            position: absolute;
+            top: 10px;
+            right: 10px; /* Place Logout button next to About */
         }
         .auth-buttons {
-            margin-top: 20px;
+            margin-top: 30px;
+        }
+        .btn-lg {
+            border-radius: 25px; /* Rounded buttons */
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Soft shadow */
+            transition: transform 0.2s ease; /* Smooth scaling */
+        }
+        .btn-lg:hover {
+            transform: scale(1.05); /* Slightly grow on hover */
+        }
+        .btn-primary {
+            background-color: #ff6347; /* Tomato color for login */
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: #ff4500; /* Darker shade for hover */
+        }
+        .btn-success {
+            background-color: #32cd32; /* Lime green for signup */
+            border: none;
+        }
+        .btn-success:hover {
+            background-color: #228b22; /* Darker green for hover */
+        }
+        h1 {
+            color: #ff6347; /* Matching header color */
+            text-shadow: 1px 1px #ffa07a; /* Fun shadow effect */
+            font-size: 3em;
+            margin-top: 40px;
+        }
+        p.lead {
+            font-size: 1.5em; /* Slightly larger text */
+            color: #ff4500; /* Bright color for the description */
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
         }
     </style>
 </head>
 <body>
 
-    <!-- Navbar for Toto_tunes and About Button -->
-    <nav class="navbar navbar-light bg-light">
-        <!-- Toto_tunes Button -->
-        <a href="/" class="navbar-brand">Toto_Tunes</a>
+    <!-- Navbar for Toto Tunes -->
+    <nav class="navbar navbar-light">
+        <!-- Toto Tunes Button -->
+        <a href="/" class="navbar-brand">Toto Tunes</a>
 
-        <!-- About Button (Top left corner) -->
+        <!-- About and Log Out Buttons (Top right corner) -->
         <div class="about-button">
             <a href="{{ url_for('game.about') }}" class="btn btn-about">About</a>
+        </div>
+        <div class="logout-button">
+            <!-- Log Out Button -->
+            <a href="{{ url_for('game.home') }}" class="btn btn-logout">Log Out</a>
         </div>
     </nav>
 
@@ -54,7 +108,7 @@
     <div class="container text-center">
         <div class="row justify-content-center">
             <div class="col-md-6">
-                <h1 class="mt-5">Welcome to Toto Tunes</h1>
+                <h1>🎵 Welcome to Toto Tunes! 🎵</h1>
                 <p class="lead">Enhance your child's learning experience with fun and interactive games!</p>
 
                 <!-- Login and Signup Buttons -->
