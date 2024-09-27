@@ -1,8 +1,9 @@
 """ Game routes for the application """
-from flask import Blueprint, render_template, session, redirect, url_for, flash, request, jsonify
+import random
+from flask import Blueprint, render_template, session, redirect, url_for, flash, jsonify
 from flask_login import login_required
 from ..models import db, ChildProfile, Category, Element, Score
-import random
+
 
 game = Blueprint('game', __name__)
 
@@ -78,6 +79,7 @@ def game_dashboard(child_id, category_id):
 @game.route('/update_score/<int:score>', methods=['POST'])
 @login_required
 def update_score(score):
+    """ Update the score in the session """
     session['score'] = score
     return jsonify(success=True)
 
@@ -159,4 +161,3 @@ def result(profile_id, category_id):
 def exit_game():
     """ Exit the game and redirect to the main page """
     return redirect(url_for('auth.home'))
-

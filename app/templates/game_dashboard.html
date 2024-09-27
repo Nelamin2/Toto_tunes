@@ -112,31 +112,33 @@
     </div>
 
     <script>
-        var maxRounds = 10;  // Limit to 10 rounds
-        var currentRound = 0;  // Track the current round
+        var maxRounds = 10;  // Limit to 10 rounds per category
+        var currentRound = 0;  // Track the current round for the category
         var timeLeft = 20;  // Timer duration set to 20 seconds
         var timerId;
         var correctAnswer = "{{ correct_element.id }}";  // Correct answer ID
         var audio = new Audio("{{ audio_url }}");  // Element audio
         var bravoAudio = new Audio("{{ url_for('static', filename='audio/bravo.mp3') }}");  // Bravo audio
         var tryAgainAudio = new Audio("{{ url_for('static', filename='audio/try_again.mp3') }}");  // "Try again" audio
-
+    
         document.addEventListener('DOMContentLoaded', function() {
+            // Load current round count from session storage
+            currentRound = parseInt(sessionStorage.getItem('currentRound')) || 0;
             playAudio();
         });
-
+    
         function playAudio() {
             audio.play().catch(console.error);
             startTimer();
             document.getElementById('timer').style.display = 'block';
         }
-
+    
         function startTimer() {
             timeLeft = 20;
             document.getElementById('timer').innerHTML = timeLeft + ' seconds remaining <span>⏳</span>';
             timerId = setInterval(countdown, 1000);
         }
-
+    
         function countdown() {
             if (timeLeft <= 0) {
                 clearInterval(timerId);
@@ -145,14 +147,25 @@
             document.getElementById('timer').innerHTML = timeLeft + ' seconds remaining <span>⏳</span>';
             timeLeft--;
         }
-
+    
         function submitAnswer(selectedId) {
             clearInterval(timerId);  // Stop timer
-
+    
             if (selectedId === correctAnswer) {
                 document.getElementById(selectedId).classList.add('glow');
                 bravoAudio.play();
-                setTimeout(fetchNewQuestion, 2000);
+                currentRound++;  // Increment current round
+                
+                // Update round count in session storage
+                sessionStorage.setItem('currentRound', currentRound);
+    
+                if (currentRound >= maxRounds) {
+                    setTimeout(function() {
+                        window.location.href = "{{ url_for('game.result', category_id=category_id, profile_id=child_id) }}";  // Redirect to results page
+                    }, 2000);
+                } else {
+                    setTimeout(fetchNewQuestion, 2000);
+                }
             } else {
                 document.getElementById(selectedId).classList.add('shake');
                 tryAgainAudio.play();
@@ -163,21 +176,23 @@
                 }, 500);
             }
         }
-
+    
         function showTimeUp() {
             document.getElementById('result').innerHTML = '<span class="text-danger">Time is up! Try Again! ⏳</span>';
             tryAgainAudio.play();
             highlightCorrectAnswer();
             setTimeout(fetchNewQuestion, 2500);
         }
-
+    
         function highlightCorrectAnswer() {
             document.getElementById(correctAnswer).classList.add('glow');  // Highlight correct
         }
-
+    
         function fetchNewQuestion() {
             window.location.reload();  // Temporary reload for simplicity
         }
+
     </script>
+    
 </body>
 </html>
